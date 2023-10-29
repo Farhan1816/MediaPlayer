@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+
     boolean checkPermission(){
         int result = ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.READ_MEDIA_AUDIO);
         if(result == PackageManager.PERMISSION_GRANTED){
