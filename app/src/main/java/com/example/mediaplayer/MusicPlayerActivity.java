@@ -2,6 +2,9 @@ package com.example.mediaplayer;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,8 +25,9 @@ public class MusicPlayerActivity extends AppCompatActivity {
     ArrayList<AudioModel> songsList;
     AudioModel currentSong;
     MediaPlayer mediaPlayer = MyMediaPlayer.getInstance();
-    int x=0;
 
+    int x=0;
+    boolean isPlaying;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,8 +86,6 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
             }
         });
-
-
     }
 
     void setResourcesWithMusic(){
@@ -96,12 +98,17 @@ public class MusicPlayerActivity extends AppCompatActivity {
         pausePlay.setOnClickListener(v-> pausePlay());
         nextBtn.setOnClickListener(v-> playNextSong());
         previousBtn.setOnClickListener(v-> playPreviousSong());
-
+        CreateNotificationOffline.createNotificationOffline(this, currentSong.getTitle(), R.drawable.ic_pause_black_24dp);
+        isPlaying = true;
         playMusic();
-
-
     }
 
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            pausePlay();
+        }
+    };
 
     private void playMusic(){
 
@@ -115,8 +122,6 @@ public class MusicPlayerActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
     private void playNextSong(){
@@ -135,12 +140,17 @@ public class MusicPlayerActivity extends AppCompatActivity {
     }
 
     private void pausePlay(){
-        if(mediaPlayer.isPlaying())
+        if(mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
-        else
+            isPlaying = false;
+            CreateNotificationOffline.createNotificationOffline(this, currentSong.getTitle(), R.drawable.ic_play_arrow_black_24dp);
+        }
+        else {
             mediaPlayer.start();
+            isPlaying = true;
+            CreateNotificationOffline.createNotificationOffline(this, currentSong.getTitle(), R.drawable.ic_pause_black_24dp);
+        }
     }
-
 
     public static String convertToMMSS(String duration){
         Long millis = Long.parseLong(duration);

@@ -21,6 +21,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -28,6 +30,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -38,11 +41,13 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+
     private ExoPlayer exoPlayer;
     private PlayerView playerView;
     private Button fileButton;
     private RecyclerView recyclerView;
     private TextView noMusicTextView;
+    NotificationManager notificationManagerOffline;
 
     private ArrayList<AudioModel>songsList;
 
@@ -50,9 +55,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1);
         songsList = new ArrayList<>();
         recyclerView = findViewById(R.id.recycler_view);
         noMusicTextView = findViewById(R.id.no_songs_text);
+        createChannelOffline();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if(checkPermission() == false) {
@@ -84,6 +91,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void createChannelOffline() {
+        Log.d("debug", "creatingChannel");
+        NotificationChannel channel = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            channel = new NotificationChannel(CreateNotificationOffline.CHANNELID, "Farhan", NotificationManager.IMPORTANCE_DEFAULT);
+        }
+
+        notificationManagerOffline = (NotificationManager)getSystemService(NotificationManager.class);
+        if (notificationManagerOffline != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                notificationManagerOffline.createNotificationChannel(channel);
+            }
+        }
+    }
 
     boolean checkPermission(){
         int result = ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.READ_MEDIA_AUDIO);
