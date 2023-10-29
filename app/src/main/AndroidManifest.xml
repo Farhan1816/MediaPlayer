@@ -28,6 +28,7 @@
             </intent-filter>
         </activity>
         <receiver android:name=".NotificationActionService"/>
+        <service android:name=".OnClearFromRecentService"/>
     </application>
 
 </manifest>

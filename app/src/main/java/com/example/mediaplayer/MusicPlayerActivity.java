@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,8 +25,9 @@ public class MusicPlayerActivity extends AppCompatActivity {
     ImageView pausePlay,nextBtn,previousBtn,musicIcon;
     ArrayList<AudioModel> songsList;
     AudioModel currentSong;
-    MediaPlayer mediaPlayer = MyMediaPlayer.getInstance();
 
+    MediaPlayer mediaPlayer = MyMediaPlayer.getInstance();
+    BroadcastReceiver broadcastReceiver;
     int x=0;
     boolean isPlaying;
     @Override
@@ -41,6 +43,14 @@ public class MusicPlayerActivity extends AppCompatActivity {
         nextBtn = findViewById(R.id.next);
         previousBtn = findViewById(R.id.previous);
         musicIcon = findViewById(R.id.music_icon_big);
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                pausePlay();
+            }
+        };
+        registerReceiver(broadcastReceiver, new IntentFilter("TRACKS_TRACKS"));
+        startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
 
         titleTv.setSelected(true);
 
@@ -103,12 +113,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         playMusic();
     }
 
-    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            pausePlay();
-        }
-    };
+
 
     private void playMusic(){
 
